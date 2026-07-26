@@ -25,16 +25,33 @@ img{display:block;max-width:100%}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 /* AURORA */
-#aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.au{position:absolute;border-radius:50%;filter:blur(130px);opacity:.26}
-.au1{width:66vw;height:66vw;background:#4C1D95;top:-22vw;left:-14vw;animation:a1 26s ease-in-out infinite alternate}
-.au2{width:52vw;height:52vw;background:#5B21B6;bottom:-20vw;right:-12vw;animation:a2 32s ease-in-out infinite alternate}
-.au3{width:42vw;height:42vw;background:#2E0B5C;top:38%;left:42%;animation:a3 22s ease-in-out infinite alternate}
-@keyframes a1{to{transform:translate(14vw,10vh) scale(1.18)}}
-@keyframes a2{to{transform:translate(-12vw,-8vh) scale(1.12)}}
-@keyframes a3{to{transform:translate(-16vw,12vh) scale(.85)}}
-@media(prefers-reduced-motion:reduce){.au{animation:none}}
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 header,.hero,.filters,.wrap,footer{position:relative;z-index:1}
+
+/* ---------- INTRO: BARRIDO DE LUZ ---------- */
+#intro{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;
+  align-items:center;justify-content:center;overflow:hidden;animation:introOut .55s ease 2s forwards}
+.intro-beam{position:absolute;top:0;bottom:0;width:42vw;left:-42vw;
+  background:linear-gradient(90deg,transparent,rgba(167,120,255,.55),transparent);
+  filter:blur(22px);animation:beamSweep 1.5s ease-in-out .2s forwards}
+.intro-logo{position:relative;font-family:'Anton',Impact,sans-serif;text-transform:uppercase;
+  font-size:clamp(40px,12vw,88px);letter-spacing:3px;color:#fff;
+  opacity:0;clip-path:inset(0 100% 0 0);animation:beamReveal 1.5s ease .2s forwards}
+.intro-logo span{color:var(--violet-glow)}
+@keyframes beamSweep{to{left:100%}}
+@keyframes beamReveal{0%{opacity:0;clip-path:inset(0 100% 0 0)}55%{opacity:1;clip-path:inset(0 0 0 0)}100%{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes introOut{to{opacity:0;visibility:hidden}}
+@media(prefers-reduced-motion:reduce){#intro{animation:introOut .3s ease .2s forwards}.intro-logo{animation:none;opacity:1;clip-path:none}.intro-beam{display:none}}
+
+/* entrada del hero */
+.hero-inner>*{opacity:0;transform:translateY(20px);animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards}
+.hero-inner .eyebrow{animation-delay:2.15s}
+.hero-inner h1{animation-delay:2.3s}
+.hero-inner p{animation-delay:2.45s}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+/* entrada escalonada de las tarjetas */
+.card{opacity:0;transform:translateY(24px);animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
+@media(prefers-reduced-motion:reduce){.hero-inner>*,.card{opacity:1;transform:none;animation:none}}
 
 /* HEADER */
 header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
@@ -57,7 +74,7 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 .eyebrow{display:inline-block;font-size:12px;letter-spacing:4px;color:var(--violet-glow);
   background:var(--violet-soft);border:1px solid rgba(124,58,237,.28);padding:7px 16px;border-radius:999px;margin-bottom:22px}
 .hero h1{font-size:clamp(62px,16vw,132px);line-height:.86;letter-spacing:2px;color:#fff}
-.hero h1 em{font-style:normal;color:var(--violet-glow);text-shadow:0 0 55px rgba(124,58,237,.55)}
+.hero h1 em{font-style:normal;color:var(--violet-glow)}
 .hero p{margin:20px auto 0;max-width:480px;color:var(--muted);font-size:15px}
 
 /* FILTROS */
@@ -69,8 +86,8 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 .chip.active{background:var(--violet-bright);color:#fff;border-color:var(--violet-bright)}
 
 /* GRID */
-.wrap{max-width:1200px;margin:0 auto;padding:30px 18px 90px}
-.grid{display:grid;gap:16px;grid-template-columns:repeat(2,1fr)}
+.wrap{max-width:1200px;margin:0 auto;padding:26px 10px 90px}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
 @media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:17px;overflow:hidden;
@@ -86,17 +103,15 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 .b-new{background:var(--ok);color:#062;font-weight:700}
 .b-feat{background:var(--violet-bright)}
 .b-sold{background:var(--err);color:#3a0d0d}
-.photo-count{position:absolute;bottom:9px;right:9px;background:rgba(10,8,16,.8);color:var(--muted);
-  font-size:11px;padding:3px 8px;border-radius:7px}
-.card-body{padding:13px;display:flex;flex-direction:column;flex:1}
-.card-cat{font-size:11px;letter-spacing:2px;color:var(--violet-glow)}
-.card-name{font-size:18px;letter-spacing:.5px;margin:6px 0 4px;line-height:1.1;color:#fff}
-.card-desc{font-size:13px;color:var(--muted);margin-bottom:12px;flex:1}
+.card-body{padding:12px;display:flex;flex-direction:column;flex:1}
+.card-cat{font-size:10px;letter-spacing:2.5px;color:var(--violet-glow)}
+.card-name{font-size:15px;letter-spacing:.5px;margin:5px 0 3px;line-height:1.1;color:#fff}
+.card-desc{font-size:12px;color:var(--muted);margin-bottom:10px;flex:1}
 .card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
-.price{font-size:29px;letter-spacing:1px;color:var(--violet-glow);line-height:1}
-.price s{display:block;font-size:14px;color:var(--muted);letter-spacing:0}
-.add{background:var(--violet-soft);color:var(--violet-glow);font-size:14px;letter-spacing:1px;
-  padding:9px 14px;border-radius:10px;transition:.18s;white-space:nowrap}
+.price{font-size:21px;letter-spacing:.5px;color:var(--violet-glow);line-height:1}
+.price s{display:block;font-size:12px;color:var(--muted);letter-spacing:0}
+.add{background:var(--violet-soft);color:var(--violet-glow);font-size:11px;letter-spacing:1.5px;
+  padding:8px 12px;border-radius:9px;transition:.18s;white-space:nowrap}
 .add:hover{background:var(--violet-bright);color:#fff}
 .add:disabled{opacity:.4;cursor:not-allowed}
 
@@ -118,8 +133,8 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 .m-photos img{width:100%;flex:0 0 100%;aspect-ratio:1/1;object-fit:cover;scroll-snap-align:center}
 .m-body{padding:20px}
 .m-cat{font-size:11px;letter-spacing:2px;color:var(--violet-glow)}
-.m-name{font-size:28px;letter-spacing:1px;margin:6px 0 10px;line-height:1.05;color:#fff}
-.m-price{font-size:36px;letter-spacing:1px;color:var(--violet-glow);line-height:1;margin-bottom:14px}
+.m-name{font-size:22px;letter-spacing:.5px;margin:6px 0 10px;line-height:1.05;color:#fff}
+.m-price{font-size:27px;letter-spacing:.5px;color:var(--violet-glow);line-height:1;margin-bottom:14px}
 .m-price s{font-size:17px;color:var(--muted);margin-right:9px}
 .m-desc{color:var(--muted);font-size:14px;margin-bottom:14px;white-space:pre-line}
 .sizes{background:var(--field);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
@@ -169,7 +184,9 @@ footer .logo{font-size:20px;margin-bottom:8px}
 </head>
 <body>
 
-<div id="aurora"><div class="au au1"></div><div class="au au2"></div><div class="au au3"></div></div>
+<div id="intro"><div class="intro-beam"></div><div class="intro-logo">AMH<span>·</span>STORE</div></div>
+
+<canvas id="bgCanvas"></canvas>
 
 <header>
   <div class="nav">
@@ -291,16 +308,17 @@ function renderGrid(){
   const t=T[lang];
   const list=activeCat==="__all__"?products:products.filter(p=>p.categoria===activeCat);
   if(!list.length){$("grid").innerHTML=`<div class="state" style="grid-column:1/-1">${t.empty}</div>`;return;}
-  $("grid").innerHTML=list.map(p=>{
+  const introDone=document.body.classList.contains("ready");
+  $("grid").innerHTML=list.map((p,idx)=>{
+    const delay=introDone?Math.min(idx*60,600):2400+Math.min(idx*70,700);
     const f=photo(p),n=Array.isArray(p.fotos)?p.fotos.length:0;
     const tags=[p.is_new?`<span class="badge b-new">New</span>`:'',
                 p.featured?`<span class="badge b-feat">★</span>`:'',
                 p.sold_out?`<span class="badge b-sold">${t.sold}</span>`:''].join("");
-    return `<div class="card ${p.sold_out?'sold':''}" onclick="openModal(${p.id})">
+    return `<div class="card ${p.sold_out?'sold':''}" style="animation-delay:${delay}ms" onclick="openModal(${p.id})">
       <div class="card-img">
         <div class="tags">${tags}</div>
         ${f?`<img src="${f}" alt="${p.nombre}" loading="lazy" onerror="this.style.opacity=.15">`:'<div class="noimg">📷</div>'}
-        ${n>1?`<span class="photo-count">${n} 📷</span>`:''}
       </div>
       <div class="card-body">
         <span class="card-cat">${p.categoria||''}</span>
@@ -406,8 +424,52 @@ $("cartBtn").onclick=openCart;
 $("closeCart").onclick=closeCart;
 $("overlay").onclick=()=>{closeModal();closeCart();};
 $("checkout").onclick=checkout;
+/* ---------- FONDO: HUMO + BRASAS ---------- */
+(function(){
+  const cv=document.getElementById("bgCanvas");
+  if(!cv) return;
+  const ctx=cv.getContext("2d");
+  let W,H,DPR,clouds=[],sparks=[];
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const R=(a,b)=>Math.random()*(b-a)+a;
+  function size(){DPR=Math.min(window.devicePixelRatio||1,2);
+    W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;
+    cv.style.width=innerWidth+"px";cv.style.height=innerHeight+"px";}
+  function make(){
+    clouds=[];for(let i=0;i<9;i++)clouds.push({x:R(0,W),y:R(0,H),r:R(150,270)*DPR,vx:R(-.18,.18)*DPR,vy:R(-.14,.14)*DPR,a:R(.05,.13),h:R(255,285)});
+    sparks=[];const n=innerWidth<700?45:80;
+    for(let i=0;i<n;i++)sparks.push({x:R(0,W),y:R(0,H),r:R(.8,2.1)*DPR,vy:R(-.4,-.14)*DPR,vx:R(-.06,.06)*DPR,a:R(.25,.75),ph:R(0,6.28),sp:R(.012,.032)});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation="lighter";
+    for(const o of clouds){o.x+=o.vx;o.y+=o.vy;
+      if(o.x<-o.r)o.x=W+o.r;if(o.x>W+o.r)o.x=-o.r;if(o.y<-o.r)o.y=H+o.r;if(o.y>H+o.r)o.y=-o.r;
+      const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+      g.addColorStop(0,`hsla(${o.h},70%,55%,${o.a})`);g.addColorStop(1,"hsla(270,70%,50%,0)");
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,6.283);ctx.fill();}
+    for(const p of sparks){p.x+=p.vx;p.y+=p.vy;p.ph+=p.sp;
+      if(p.y<-4)p.y=H+4;if(p.x<-4)p.x=W+4;if(p.x>W+4)p.x=-4;
+      const a=p.a*(.5+.5*Math.sin(p.ph));
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.283);
+      ctx.fillStyle=`rgba(190,155,255,${a})`;ctx.shadowBlur=9*DPR;ctx.shadowColor="rgba(124,58,237,.9)";ctx.fill();}
+    ctx.shadowBlur=0;ctx.globalCompositeOperation="source-over";
+    requestAnimationFrame(draw);
+  }
+  size();make();
+  if(reduce){ // fondo estático suave
+    ctx.globalCompositeOperation="lighter";
+    for(const o of clouds){const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+      g.addColorStop(0,`hsla(${o.h},70%,55%,${o.a})`);g.addColorStop(1,"hsla(270,70%,50%,0)");
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,6.283);ctx.fill();}
+    ctx.globalCompositeOperation="source-over";
+  }else draw();
+  let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{size();make();},200);});
+})();
+
 $("year").textContent=new Date().getFullYear();
 load();
+setTimeout(()=>document.body.classList.add("ready"),2600);
 </script>
 </body>
 </html>
