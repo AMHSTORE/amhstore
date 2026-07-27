@@ -87,6 +87,18 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 
 /* GRID */
 .wrap{max-width:1200px;margin:0 auto;padding:26px 10px 90px}
+/* SECCIONES POR CATEGORÍA (banner estilo Zerufy) */
+.cat-section{margin-bottom:30px}
+.cat-banner{position:relative;width:100%;padding:20px 22px;margin-bottom:12px;border-radius:14px;
+  overflow:hidden;background:linear-gradient(135deg,#140F22,#1C1030,#140F22);border:1px solid var(--line)}
+.cat-banner::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(130% 150% at 100% 0,rgba(124,58,237,.28),transparent 60%);pointer-events:none}
+.cat-banner-label{position:relative;z-index:1;font-family:'Anton',sans-serif;text-transform:uppercase;
+  font-size:10px;letter-spacing:4px;color:var(--violet-glow);margin-bottom:4px}
+.cat-banner-title{position:relative;z-index:1;font-family:'Anton',sans-serif;text-transform:uppercase;
+  font-size:clamp(30px,8vw,44px);letter-spacing:2px;color:#fff;line-height:1}
+.cat-banner-line{position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--violet-bright),transparent)}
 .grid{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
 @media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
@@ -212,7 +224,7 @@ footer .logo{font-size:20px;margin-bottom:8px}
 <div class="filters"><div class="filters-inner" id="filters"></div></div>
 
 <div class="wrap">
-  <div id="grid" class="grid"></div>
+  <div id="grid"></div>
   <div id="stateBox" class="state"><div class="spinner"></div><p id="loadingText">Cargando catálogo…</p></div>
 </div>
 
@@ -261,12 +273,12 @@ const T={
      loading:"Cargando catálogo…",empty:"Pronto agregamos productos aquí.",all:"Todo",add:"Agregar",
      cart:"Tu carrito",cartEmpty:"Tu carrito está vacío",total:"Total",checkout:"Comprar por WhatsApp",
      foot:"Escríbenos por WhatsApp para comprar",hi:"Hola AMH STORE 👋 Quiero pedir:",totalWord:"Total",
-     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito"},
+     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito",newColl:"Colección"},
  en:{lang:"ES",eyebrow:"Watches · Jewelry · Accessories",tag:"Curated pieces. Style you actually wear.",
      loading:"Loading catalog…",empty:"Products coming soon.",all:"All",add:"Add",
      cart:"Your cart",cartEmpty:"Your cart is empty",total:"Total",checkout:"Checkout on WhatsApp",
      foot:"Message us on WhatsApp to order",hi:"Hi AMH STORE 👋 I'd like to order:",totalWord:"Total",
-     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart"}
+     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart",newColl:"Collection"}
 };
 
 let lang="es",products=[],activeCat="__all__",cart={};
@@ -304,18 +316,12 @@ function priceHTML(p,t){
   return money(p.precio);
 }
 
-function renderGrid(){
-  const t=T[lang];
-  const list=activeCat==="__all__"?products:products.filter(p=>p.categoria===activeCat);
-  if(!list.length){$("grid").innerHTML=`<div class="state" style="grid-column:1/-1">${t.empty}</div>`;return;}
-  const introDone=document.body.classList.contains("ready");
-  $("grid").innerHTML=list.map((p,idx)=>{
-    const delay=introDone?Math.min(idx*60,600):2400+Math.min(idx*70,700);
-    const f=photo(p),n=Array.isArray(p.fotos)?p.fotos.length:0;
-    const tags=[p.is_new?`<span class="badge b-new">New</span>`:'',
-                p.featured?`<span class="badge b-feat">★</span>`:'',
-                p.sold_out?`<span class="badge b-sold">${t.sold}</span>`:''].join("");
-    return `<div class="card ${p.sold_out?'sold':''}" style="animation-delay:${delay}ms" onclick="openModal(${p.id})">
+function cardHTML(p,delay,t){
+  const f=photo(p);
+  const tags=[p.is_new?`<span class="badge b-new">New</span>`:'',
+              p.featured?`<span class="badge b-feat">★</span>`:'',
+              p.sold_out?`<span class="badge b-sold">${t.sold}</span>`:''].join("");
+  return `<div class="card ${p.sold_out?'sold':''}" style="animation-delay:${delay}ms" onclick="openModal(${p.id})">
       <div class="card-img">
         <div class="tags">${tags}</div>
         ${f?`<img src="${f}" alt="${p.nombre}" loading="lazy" onerror="this.style.opacity=.15">`:'<div class="noimg">📷</div>'}
@@ -332,7 +338,40 @@ function renderGrid(){
         </div>
       </div>
     </div>`;
-  }).join("");
+}
+
+function renderGrid(){
+  const t=T[lang];
+  const list=activeCat==="__all__"?products:products.filter(p=>p.categoria===activeCat);
+  if(!list.length){$("grid").innerHTML=`<div class="state">${t.empty}</div>`;return;}
+
+  // agrupar por categoría, en el orden en que aparecen
+  const order=[], groups={};
+  list.forEach(p=>{
+    const c=p.categoria||"—";
+    if(!groups[c]){groups[c]=[];order.push(c);}
+    groups[c].push(p);
+  });
+
+  const introDone=document.body.classList.contains("ready");
+  let idx=0, html="";
+  order.forEach(cat=>{
+    const label = t.lang==="ES" ? "Colección" : "Colección"; // etiqueta pequeña
+    html+=`<section class="cat-section" id="sec-${cat.replace(/\s+/g,'-')}">
+      <div class="cat-banner">
+        <div class="cat-banner-label">${t.newColl}</div>
+        <div class="cat-banner-title">${cat}</div>
+        <div class="cat-banner-line"></div>
+      </div>
+      <div class="grid">`;
+    groups[cat].forEach(p=>{
+      const delay=introDone?Math.min(idx*60,700):2400+Math.min(idx*70,800);
+      html+=cardHTML(p,delay,t);
+      idx++;
+    });
+    html+=`</div></section>`;
+  });
+  $("grid").innerHTML=html;
 }
 
 /* ---------- MODAL ---------- */
