@@ -287,6 +287,28 @@ const money=n=>"$"+Number(n).toLocaleString("en-US",{maximumFractionDigits:0});
 const finalPrice=p=>p.discount_price!=null?p.discount_price:p.precio;
 const photo=p=>Array.isArray(p.fotos)&&p.fotos.length?p.fotos[0]:null;
 
+/* ---------- TRADUCCIÓN AUTOMÁTICA (es → en) ---------- */
+const txCache={};
+async function tx(text){
+  if(!text||lang!=="en") return text;
+  if(txCache[text]) return txCache[text];
+  try{
+    const url="https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=en&dt=t&q="+encodeURIComponent(text);
+    const r=await fetch(url); const d=await r.json();
+    let out=""; if(d&&d[0]) d[0].forEach(x=>{if(x[0])out+=x[0];});
+    if(out) txCache[text]=out;
+    return out||text;
+  }catch(e){return text;}
+}
+async function translateView(){
+  if(lang!=="en") return;
+  const els=document.querySelectorAll("[data-tx]");
+  for(const el of els){
+    const original=el.getAttribute("data-tx");
+    if(original) el.textContent=await tx(original);
+  }
+}
+
 async function load(){
   try{
     const r=await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${CONFIG.TABLE}?select=*&order=sort_order.asc`,
@@ -305,9 +327,10 @@ function renderFilters(){
   const t=T[lang];
   const cats=[...new Set(products.map(p=>p.categoria).filter(Boolean))];
   let html=`<button class="chip ${activeCat==='__all__'?'active':''}" data-c="__all__">${t.all}</button>`;
-  cats.forEach(c=>html+=`<button class="chip ${activeCat===c?'active':''}" data-c="${c}">${c}</button>`);
+  cats.forEach(c=>html+=`<button class="chip ${activeCat===c?'active':''}" data-c="${c}" data-tx="${c}">${c}</button>`);
   $("filters").innerHTML=html;
   document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{activeCat=b.dataset.c;renderFilters();renderGrid();});
+  translateView();
 }
 
 function priceHTML(p,t){
@@ -327,9 +350,9 @@ function cardHTML(p,delay,t){
         ${f?`<img src="${f}" alt="${p.nombre}" loading="lazy" onerror="this.style.opacity=.15">`:'<div class="noimg">📷</div>'}
       </div>
       <div class="card-body">
-        <span class="card-cat">${p.categoria||''}</span>
+        <span class="card-cat" data-tx="${p.categoria||''}">${p.categoria||''}</span>
         <div class="card-name">${p.nombre}</div>
-        <div class="card-desc">${p.descripcion_breve||''}</div>
+        <div class="card-desc" data-tx="${(p.descripcion_breve||'').replace(/"/g,'&quot;')}">${p.descripcion_breve||''}</div>
         <div class="card-foot">
           <span class="price">${priceHTML(p,t)}</span>
           <button class="add" onclick="event.stopPropagation();addToCart(${p.id})" ${p.sold_out?'disabled':''}>
@@ -360,7 +383,7 @@ function renderGrid(){
     html+=`<section class="cat-section" id="sec-${cat.replace(/\s+/g,'-')}">
       <div class="cat-banner">
         <div class="cat-banner-label">${t.newColl}</div>
-        <div class="cat-banner-title">${cat}</div>
+        <div class="cat-banner-title" data-tx="${cat}">${cat}</div>
         <div class="cat-banner-line"></div>
       </div>
       <div class="grid">`;
@@ -372,6 +395,7 @@ function renderGrid(){
     html+=`</div></section>`;
   });
   $("grid").innerHTML=html;
+  translateView();
 }
 
 /* ---------- MODAL ---------- */
@@ -382,10 +406,10 @@ function openModal(id){
   $("mBox").innerHTML=`
     ${fotos.length?`<div class="m-photos">${fotos.map(f=>`<img src="${f}" alt="${p.nombre}">`).join("")}</div>`:''}
     <div class="m-body">
-      <div class="m-cat">${p.categoria||''}</div>
+      <div class="m-cat" data-tx="${p.categoria||''}">${p.categoria||''}</div>
       <div class="m-name">${p.nombre}</div>
       <div class="m-price">${priceHTML(p,t)}</div>
-      ${p.descripcion?`<div class="m-desc">${p.descripcion}</div>`:''}
+      ${p.descripcion?`<div class="m-desc" data-tx="${(p.descripcion||'').replace(/"/g,'&quot;')}">${p.descripcion}</div>`:''}
       ${p.medidas?`<div class="sizes"><b>${t.sizes}</b>${p.medidas}</div>`:''}
       <div class="m-actions">
         <button class="m-add" onclick="addToCart(${p.id});closeModal()" ${p.sold_out?'disabled':''}>
@@ -395,6 +419,7 @@ function openModal(id){
       </div>
     </div>`;
   $("modal").classList.add("open");$("overlay").classList.add("open");
+  translateView();
 }
 function closeModal(){$("modal").classList.remove("open");if(!$("drawer").classList.contains("open"))$("overlay").classList.remove("open");}
 
