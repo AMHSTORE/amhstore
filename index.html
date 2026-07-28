@@ -90,7 +90,7 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
   background:rgba(10,8,16,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
   display:flex;align-items:center;height:46px}
 .marquee-track{display:flex;align-items:center;gap:24px;width:max-content;padding-left:24px;
-  animation:mqScroll 20s linear infinite}
+  animation:mqScroll 10s linear infinite}
 .marquee-bar:hover .marquee-track,.marquee-track:active{animation-play-state:paused}
 @keyframes mqScroll{to{transform:translateX(-50%)}}
 .mq-item{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:16px;letter-spacing:1.5px;
@@ -358,8 +358,12 @@ function renderMarquee(cats){
   const block=`${one}<span class="mq-dia">◆</span>`;
   // se duplica para loop infinito continuo
   track.innerHTML=block+block;
-  // velocidad según cantidad (más categorías = un poco más lento)
-  track.style.animationDuration=Math.max(14,cats.length*4)+"s";
+  // velocidad constante (píxeles por segundo), no depende de cuántas categorías haya
+  requestAnimationFrame(()=>{
+    const halfWidth=track.scrollWidth/2;
+    const SPEED=95; // px por segundo — súbelo para más rápido, bájalo para más lento
+    track.style.animationDuration=Math.max(6,halfWidth/SPEED)+"s";
+  });
   track.querySelectorAll(".mq-item").forEach(el=>el.onclick=()=>{activeCat=el.dataset.c;renderFilters();renderGrid();window.scrollTo({top:0,behavior:"smooth"});});
 }
 
