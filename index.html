@@ -85,6 +85,20 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
   background:var(--surface);color:var(--muted);font-size:13px;letter-spacing:1px;transition:.18s}
 .chip.active{background:var(--violet-bright);color:#fff;border-color:var(--violet-bright)}
 
+/* CINTA ANIMADA DE CATEGORÍAS (estilo Zerufy) */
+.marquee-bar{position:sticky;top:calc(70px + 49px);z-index:29;overflow:hidden;
+  background:rgba(10,8,16,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;height:46px}
+.marquee-track{display:flex;align-items:center;gap:24px;width:max-content;padding-left:24px;
+  animation:mqScroll 20s linear infinite}
+.marquee-bar:hover .marquee-track,.marquee-track:active{animation-play-state:paused}
+@keyframes mqScroll{to{transform:translateX(-50%)}}
+.mq-item{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:16px;letter-spacing:1.5px;
+  color:var(--muted);white-space:nowrap;cursor:pointer;transition:.2s}
+.mq-item:hover{color:var(--violet-glow);text-shadow:0 0 14px rgba(167,120,255,.6)}
+.mq-dia{color:var(--violet);font-size:10px;opacity:.75}
+@media(prefers-reduced-motion:reduce){.marquee-track{animation:none}}
+
 /* GRID */
 .wrap{max-width:1200px;margin:0 auto;padding:26px 10px 90px}
 /* SECCIONES POR CATEGORÍA (banner estilo Zerufy) */
@@ -222,6 +236,7 @@ footer .logo{font-size:20px;margin-bottom:8px}
 </section>
 
 <div class="filters"><div class="filters-inner" id="filters"></div></div>
+<div class="marquee-bar" id="marqueeBar"><div class="marquee-track" id="marqueeTrack"></div></div>
 
 <div class="wrap">
   <div id="grid"></div>
@@ -330,7 +345,22 @@ function renderFilters(){
   cats.forEach(c=>html+=`<button class="chip ${activeCat===c?'active':''}" data-c="${c}" data-tx="${c}">${c}</button>`);
   $("filters").innerHTML=html;
   document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{activeCat=b.dataset.c;renderFilters();renderGrid();});
+  renderMarquee(cats);
   translateView();
+}
+
+function renderMarquee(cats){
+  const bar=$("marqueeBar"), track=$("marqueeTrack");
+  if(!cats.length){bar.style.display="none";return;}
+  bar.style.display="flex";
+  // una tanda de categorías con rombos, tocables para filtrar
+  const one=cats.map(c=>`<span class="mq-item" data-c="${c}" data-tx="${c}">${c}</span>`).join('<span class="mq-dia">◆</span>');
+  const block=`${one}<span class="mq-dia">◆</span>`;
+  // se duplica para loop infinito continuo
+  track.innerHTML=block+block;
+  // velocidad según cantidad (más categorías = un poco más lento)
+  track.style.animationDuration=Math.max(14,cats.length*4)+"s";
+  track.querySelectorAll(".mq-item").forEach(el=>el.onclick=()=>{activeCat=el.dataset.c;renderFilters();renderGrid();window.scrollTo({top:0,behavior:"smooth"});});
 }
 
 function priceHTML(p,t){
