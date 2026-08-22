@@ -279,7 +279,8 @@ const CONFIG = {
   SUPABASE_URL : "https://qiphngqxwsigmpjhroqv.supabase.co",
   SUPABASE_KEY : "sb_publishable_TgsDBkfyOEHncvcBhjwtsQ_xvC5-Ay6",
   TABLE        : "productos",
-  WHATSAPP     : "16292025713"
+  WHATSAPP     : "16292025713",
+  SITE         : "https://amhstore.store"
 };
 /* ============================================================ */
 
@@ -288,12 +289,12 @@ const T={
      loading:"Cargando catálogo…",empty:"Pronto agregamos productos aquí.",all:"Todo",add:"Agregar",
      cart:"Tu carrito",cartEmpty:"Tu carrito está vacío",total:"Total",checkout:"Comprar por WhatsApp",
      foot:"Escríbenos por WhatsApp para comprar",hi:"Hola AMH STORE 👋 Quiero pedir:",totalWord:"Total",
-     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito",newColl:"Colección",photosRef:"📷 Fotos (referencia):"},
+     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito",newColl:"Colección",photosRef:"📷 Ver producto:"},
  en:{lang:"ES",eyebrow:"Watches · Jewelry · Accessories",tag:"Curated pieces. Style you actually wear.",
      loading:"Loading catalog…",empty:"Products coming soon.",all:"All",add:"Add",
      cart:"Your cart",cartEmpty:"Your cart is empty",total:"Total",checkout:"Checkout on WhatsApp",
      foot:"Message us on WhatsApp to order",hi:"Hi AMH STORE 👋 I'd like to order:",totalWord:"Total",
-     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart",newColl:"Collection",photosRef:"📷 Photos (reference):"}
+     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart",newColl:"Collection",photosRef:"📷 View item:"}
 };
 
 let lang="es",products=[],activeCat="__all__",cart={};
@@ -333,6 +334,12 @@ async function load(){
     products=all.filter(p=>!p.hidden).sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
     $("stateBox").style.display="none";
     renderFilters();renderGrid();
+    // deep-link: si el enlace trae ?p=ID, abre ese producto directo
+    const pid=new URLSearchParams(location.search).get("p");
+    if(pid){
+      const prod=products.find(x=>String(x.id)===String(pid));
+      if(prod) setTimeout(()=>openModal(prod.id),300);
+    }
   }catch(e){
     $("stateBox").innerHTML=`<p style="color:var(--err)">No se pudo cargar el catálogo.<br><small>Revisa la config de Supabase.</small></p>`;
   }
@@ -498,40 +505,18 @@ function renderCart(){
 function openCart(){$("drawer").classList.add("open");$("overlay").classList.add("open");}
 function closeCart(){$("drawer").classList.remove("open");if(!$("modal").classList.contains("open"))$("overlay").classList.remove("open");}
 
-async function shorten(url){
-  try{
-    const ctrl=new AbortController();
-    const to=setTimeout(()=>ctrl.abort(),4000);
-    const r=await fetch("https://is.gd/create.php?format=simple&url="+encodeURIComponent(url),{signal:ctrl.signal});
-    clearTimeout(to);
-    if(!r.ok) return url;
-    const s=(await r.text()).trim();
-    return s.startsWith("http")?s:url;   // si falla, regresa el largo
-  }catch(e){ return url; }               // sin internet o error -> link largo
-}
-
-async function checkout(){
+function checkout(){
   const t=T[lang],items=Object.values(cart);if(!items.length)return;
-  const btn=$("checkout");
-  const w=window.open("","_blank");      // abrir ya la pestaña para que no la bloquee el navegador
-  const prev=$("checkoutText").textContent;
-  $("checkoutText").textContent="…";btn.disabled=true;
-
-  // acortar todas las fotos a la vez
-  const shorts=await Promise.all(items.map(i=>{const f=photo(i);return f?shorten(f):Promise.resolve("");}));
-
-  let msg=t.hi+"\n\n", fotos="";
+  const base=(CONFIG.SITE||location.origin).replace(/\/$/,"");
+  let msg=t.hi+"\n\n", links="";
   items.forEach((i,idx)=>{
     const pr=finalPrice(i);
     msg+=`${idx+1}) ${i.nombre}${i.categoria?` (${i.categoria})`:''} x${i.qty} — ${pr!=null?money(pr*i.qty):t.ask}\n`;
-    if(shorts[idx]) fotos+=`${idx+1}) ${shorts[idx]}\n`;
+    links+=`${idx+1}) ${base}/?p=${i.id}\n`;
   });
   msg+=`\n${t.totalWord}: ${money(cartTotal())}`;
-  if(fotos) msg+=`\n\n──────────\n${t.photosRef}\n${fotos}`;
-
-  const url=`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`;
-  if(w){w.location.href=url;}else{window.location.href=url;}
-  $("checkoutText").textContent=prev;btn.disabled=false;
+  if(links) msg+=`\n\n──────────\n${t.photosRef}\n${links}`;
+  window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank");
 }
 
 function applyLang(){
@@ -591,6 +576,11 @@ $("checkout").onclick=checkout;
 })();
 
 $("year").textContent=new Date().getFullYear();
+// si se abre un producto directo (?p=), saltar la intro para ver la foto rápido
+if(new URLSearchParams(location.search).get("p")){
+  const intro=$("intro"); if(intro) intro.style.display="none";
+  document.body.classList.add("ready");
+}
 load();
 setTimeout(()=>document.body.classList.add("ready"),2600);
 </script>
