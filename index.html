@@ -498,19 +498,40 @@ function renderCart(){
 function openCart(){$("drawer").classList.add("open");$("overlay").classList.add("open");}
 function closeCart(){$("drawer").classList.remove("open");if(!$("modal").classList.contains("open"))$("overlay").classList.remove("open");}
 
-function checkout(){
+async function shorten(url){
+  try{
+    const ctrl=new AbortController();
+    const to=setTimeout(()=>ctrl.abort(),4000);
+    const r=await fetch("https://is.gd/create.php?format=simple&url="+encodeURIComponent(url),{signal:ctrl.signal});
+    clearTimeout(to);
+    if(!r.ok) return url;
+    const s=(await r.text()).trim();
+    return s.startsWith("http")?s:url;   // si falla, regresa el largo
+  }catch(e){ return url; }               // sin internet o error -> link largo
+}
+
+async function checkout(){
   const t=T[lang],items=Object.values(cart);if(!items.length)return;
-  let msg=t.hi+"\n\n";
-  let fotos="";
+  const btn=$("checkout");
+  const w=window.open("","_blank");      // abrir ya la pestaña para que no la bloquee el navegador
+  const prev=$("checkoutText").textContent;
+  $("checkoutText").textContent="…";btn.disabled=true;
+
+  // acortar todas las fotos a la vez
+  const shorts=await Promise.all(items.map(i=>{const f=photo(i);return f?shorten(f):Promise.resolve("");}));
+
+  let msg=t.hi+"\n\n", fotos="";
   items.forEach((i,idx)=>{
     const pr=finalPrice(i);
-    const f=photo(i);
     msg+=`${idx+1}) ${i.nombre}${i.categoria?` (${i.categoria})`:''} x${i.qty} — ${pr!=null?money(pr*i.qty):t.ask}\n`;
-    if(f) fotos+=`${idx+1}) ${f}\n`;
+    if(shorts[idx]) fotos+=`${idx+1}) ${shorts[idx]}\n`;
   });
   msg+=`\n${t.totalWord}: ${money(cartTotal())}`;
   if(fotos) msg+=`\n\n──────────\n${t.photosRef}\n${fotos}`;
-  window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank");
+
+  const url=`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`;
+  if(w){w.location.href=url;}else{window.location.href=url;}
+  $("checkoutText").textContent=prev;btn.disabled=false;
 }
 
 function applyLang(){
