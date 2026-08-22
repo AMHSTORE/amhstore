@@ -361,7 +361,7 @@ function renderMarquee(cats){
   // velocidad constante (píxeles por segundo), no depende de cuántas categorías haya
   requestAnimationFrame(()=>{
     const halfWidth=track.scrollWidth/2;
-    const SPEED=95; // px por segundo — súbelo para más rápido, bájalo para más lento
+    const SPEED=180; // px por segundo — súbelo para más rápido, bájalo para más lento
     track.style.animationDuration=Math.max(6,halfWidth/SPEED)+"s";
   });
   track.querySelectorAll(".mq-item").forEach(el=>el.onclick=()=>{activeCat=el.dataset.c;renderFilters();renderGrid();window.scrollTo({top:0,behavior:"smooth"});});
@@ -501,11 +501,14 @@ function closeCart(){$("drawer").classList.remove("open");if(!$("modal").classLi
 function checkout(){
   const t=T[lang],items=Object.values(cart);if(!items.length)return;
   let msg=t.hi+"\n\n";
-  items.forEach(i=>{
+  items.forEach((i,idx)=>{
     const pr=finalPrice(i);
-    msg+=`• ${i.nombre}${i.categoria?` (${i.categoria})`:''} x${i.qty} — ${pr!=null?money(pr*i.qty):t.ask}\n`;
+    const f=photo(i);
+    msg+=`${idx+1}) ${i.nombre}${i.categoria?` (${i.categoria})`:''} x${i.qty} — ${pr!=null?money(pr*i.qty):t.ask}\n`;
+    if(f) msg+=`🔗 ${f}\n`;
+    msg+=`\n`;
   });
-  msg+=`\n${t.totalWord}: ${money(cartTotal())}`;
+  msg+=`${t.totalWord}: ${money(cartTotal())}`;
   window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank");
 }
 
