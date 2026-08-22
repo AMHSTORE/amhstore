@@ -288,12 +288,12 @@ const T={
      loading:"Cargando catálogo…",empty:"Pronto agregamos productos aquí.",all:"Todo",add:"Agregar",
      cart:"Tu carrito",cartEmpty:"Tu carrito está vacío",total:"Total",checkout:"Comprar por WhatsApp",
      foot:"Escríbenos por WhatsApp para comprar",hi:"Hola AMH STORE 👋 Quiero pedir:",totalWord:"Total",
-     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito",newColl:"Colección"},
+     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito",newColl:"Colección",photosRef:"📷 Fotos (referencia):"},
  en:{lang:"ES",eyebrow:"Watches · Jewelry · Accessories",tag:"Curated pieces. Style you actually wear.",
      loading:"Loading catalog…",empty:"Products coming soon.",all:"All",add:"Add",
      cart:"Your cart",cartEmpty:"Your cart is empty",total:"Total",checkout:"Checkout on WhatsApp",
      foot:"Message us on WhatsApp to order",hi:"Hi AMH STORE 👋 I'd like to order:",totalWord:"Total",
-     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart",newColl:"Collection"}
+     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart",newColl:"Collection",photosRef:"📷 Photos (reference):"}
 };
 
 let lang="es",products=[],activeCat="__all__",cart={};
@@ -501,14 +501,15 @@ function closeCart(){$("drawer").classList.remove("open");if(!$("modal").classLi
 function checkout(){
   const t=T[lang],items=Object.values(cart);if(!items.length)return;
   let msg=t.hi+"\n\n";
+  let fotos="";
   items.forEach((i,idx)=>{
     const pr=finalPrice(i);
     const f=photo(i);
     msg+=`${idx+1}) ${i.nombre}${i.categoria?` (${i.categoria})`:''} x${i.qty} — ${pr!=null?money(pr*i.qty):t.ask}\n`;
-    if(f) msg+=`🔗 ${f}\n`;
-    msg+=`\n`;
+    if(f) fotos+=`${idx+1}) ${f}\n`;
   });
-  msg+=`${t.totalWord}: ${money(cartTotal())}`;
+  msg+=`\n${t.totalWord}: ${money(cartTotal())}`;
+  if(fotos) msg+=`\n\n──────────\n${t.photosRef}\n${fotos}`;
   window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank");
 }
 
