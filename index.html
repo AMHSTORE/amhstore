@@ -612,7 +612,7 @@ async function submitOrder(){
   btn.disabled=true; btn.innerHTML=`<span class="spin2"></span> ${t.chkSending}`;
 
   const isShip=checkoutMode==='envio';
-  const items=Object.values(cart).map(i=>({product_id:i.id,name:i.name,qty:i.qty,price:finalPrice(i)}));
+  const items=Object.values(cart).map(i=>({product_id:i.id,name:i.name,qty:i.qty,price:finalPrice(i),image:photo(i)||''}));
 
   try{
     const r=await sb.rpc('create_order',{
