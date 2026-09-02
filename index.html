@@ -6,6 +6,7 @@
 <title>AMH STORE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --violet:#5B21B6;--violet-bright:#7C3AED;--violet-glow:#A778FF;--violet-hover:#4C1D95;
@@ -24,11 +25,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--i
 img{display:block;max-width:100%}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 
-/* AURORA */
 #bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 header,.hero,.filters,.wrap,footer{position:relative;z-index:1}
 
-/* ---------- INTRO: BARRIDO DE LUZ ---------- */
 #intro{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;
   align-items:center;justify-content:center;overflow:hidden;animation:introOut .55s ease 2s forwards}
 .intro-beam{position:absolute;top:0;bottom:0;width:42vw;left:-42vw;
@@ -43,17 +42,14 @@ header,.hero,.filters,.wrap,footer{position:relative;z-index:1}
 @keyframes introOut{to{opacity:0;visibility:hidden}}
 @media(prefers-reduced-motion:reduce){#intro{animation:introOut .3s ease .2s forwards}.intro-logo{animation:none;opacity:1;clip-path:none}.intro-beam{display:none}}
 
-/* entrada del hero */
 .hero-inner>*{opacity:0;transform:translateY(20px);animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards}
 .hero-inner .eyebrow{animation-delay:2.15s}
 .hero-inner h1{animation-delay:2.3s}
 .hero-inner p{animation-delay:2.45s}
 @keyframes rise{to{opacity:1;transform:translateY(0)}}
-/* entrada escalonada de las tarjetas */
 .card{opacity:0;transform:translateY(24px);animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
 @media(prefers-reduced-motion:reduce){.hero-inner>*,.card{opacity:1;transform:none;animation:none}}
 
-/* HEADER */
 header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .nav{max-width:1200px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{font-size:26px;letter-spacing:2px;color:#fff}
@@ -68,7 +64,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
   font-weight:700;min-width:20px;height:20px;border-radius:999px;display:flex;align-items:center;
   justify-content:center;padding:0 5px;border:2px solid var(--bg)}
 
-/* HERO */
 .hero{border-bottom:1px solid var(--line)}
 .hero-inner{max-width:1200px;margin:0 auto;padding:64px 20px 54px;text-align:center}
 .eyebrow{display:inline-block;font-size:12px;letter-spacing:4px;color:var(--violet-glow);
@@ -77,7 +72,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 .hero h1 em{font-style:normal;color:var(--violet-glow)}
 .hero p{margin:20px auto 0;max-width:480px;color:var(--muted);font-size:15px}
 
-/* FILTROS */
 .filters{position:sticky;top:70px;z-index:30;background:rgba(10,8,16,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .filters-inner{max-width:1200px;margin:0 auto;padding:11px 18px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .filters-inner::-webkit-scrollbar{display:none}
@@ -85,7 +79,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
   background:var(--surface);color:var(--muted);font-size:13px;letter-spacing:1px;transition:.18s}
 .chip.active{background:var(--violet-bright);color:#fff;border-color:var(--violet-bright)}
 
-/* CINTA ANIMADA DE CATEGORÍAS (estilo Zerufy) */
 .marquee-bar{position:sticky;top:calc(70px + 49px);z-index:29;overflow:hidden;
   background:rgba(10,8,16,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
   display:flex;align-items:center;height:46px}
@@ -99,9 +92,7 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 .mq-dia{color:var(--violet);font-size:10px;opacity:.75}
 @media(prefers-reduced-motion:reduce){.marquee-track{animation:none}}
 
-/* GRID */
 .wrap{max-width:1200px;margin:0 auto;padding:26px 10px 90px}
-/* SECCIONES POR CATEGORÍA (banner estilo Zerufy) */
 .cat-section{margin-bottom:30px}
 .cat-banner{position:relative;width:100%;padding:20px 22px;margin-bottom:12px;border-radius:14px;
   overflow:hidden;background:linear-gradient(135deg,#140F22,#1C1030,#140F22);border:1px solid var(--line)}
@@ -146,7 +137,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
   border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* MODAL PRODUCTO */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);z-index:50;
   opacity:0;pointer-events:none;transition:.25s}
 .overlay.open{opacity:1;pointer-events:auto}
@@ -173,7 +163,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 .m-add:disabled{opacity:.45;cursor:not-allowed}
 .m-close{background:var(--field);color:var(--muted);width:52px;border-radius:12px;font-size:20px}
 
-/* CARRITO */
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--surface);z-index:60;
   transform:translateX(100%);transition:.32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;
   box-shadow:-20px 0 60px rgba(0,0,0,.65)}
@@ -206,6 +195,35 @@ header{position:sticky;top:0;z-index:40;background:rgba(10,8,16,.78);backdrop-fi
 
 footer{border-top:1px solid var(--line);padding:32px 20px;text-align:center;color:var(--muted);font-size:13px}
 footer .logo{font-size:20px;margin-bottom:8px}
+
+/* ============================================================
+   NUEVO · Mini formulario de pedido (mismo lenguaje visual)
+   ============================================================ */
+.chk-back{background:none;border:none;color:var(--muted);font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;margin-bottom:14px;padding:0;font-family:'Inter',sans-serif}
+.chk-field{margin-bottom:14px}
+.chk-field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);
+  margin-bottom:6px;font-family:'Inter',sans-serif}
+.chk-field input,.chk-field textarea{width:100%;background:var(--field);border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;color:var(--ink);outline:none;font-family:'Inter',sans-serif;font-size:14px}
+.chk-field input:focus,.chk-field textarea:focus{border-color:var(--violet-bright)}
+.chk-field textarea{min-height:64px;resize:vertical}
+.chk-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.chk-opt{background:var(--field);border:1.5px solid var(--line);border-radius:12px;padding:13px 8px;text-align:center;cursor:pointer}
+.chk-opt.active{border-color:var(--violet-bright);background:var(--violet-soft)}
+.chk-opt .ic{font-size:18px;margin-bottom:4px}
+.chk-opt .ti{font-family:'Anton',sans-serif;font-size:13px;letter-spacing:.5px;color:#fff}
+.chk-opt .su{font-size:10px;color:var(--muted);font-family:'Inter',sans-serif}
+.chk-note{font-size:11px;color:var(--muted);line-height:1.6;border-left:2px solid var(--violet-bright);
+  padding:10px 12px;background:var(--violet-soft);margin-bottom:14px;border-radius:8px;font-family:'Inter',sans-serif}
+.chk-err{color:var(--err);font-size:11px;margin-top:-8px;margin-bottom:10px;display:none;font-family:'Inter',sans-serif}
+.chk-err.on{display:block}
+.chk-done{text-align:center;padding:20px 0}
+.chk-done .num{font-family:'Anton',sans-serif;font-size:22px;color:var(--violet-glow);letter-spacing:1px;margin:10px 0}
+.chk-done p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;font-family:'Inter',sans-serif}
+.spin2{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;
+  animation:spin2 .7s linear infinite;display:inline-block;vertical-align:-1px}
+@keyframes spin2{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -250,134 +268,178 @@ footer .logo{font-size:20px;margin-bottom:8px}
 
 <div class="overlay" id="overlay"></div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="m-box" id="mBox"></div>
 </div>
 
-<!-- CARRITO -->
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
     <h3 id="cartTitle">Tu carrito</h3>
     <button class="close-x" id="closeCart">×</button>
   </div>
-  <div class="drawer-body" id="cartBody"></div>
-  <div class="drawer-foot">
-    <div class="total-row"><span class="t-label" id="totalLabel">Total</span><span class="t-val" id="totalVal">$0</span></div>
-    <button class="checkout" id="checkout" disabled>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5C9.7 8.7 9 7.1 8.8 6.5c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.3.3-1 .9-1 2.3s1 2.7 1.2 2.9c.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 5-1.3A10 10 0 1 0 12 2z"/></svg>
-      <span id="checkoutText">Comprar por WhatsApp</span>
-    </button>
+
+  <div id="cartMain" style="display:contents">
+    <div class="drawer-body" id="cartBody"></div>
+    <div class="drawer-foot" id="cartFoot">
+      <div class="total-row"><span class="t-label" id="totalLabel">Total</span><span class="t-val" id="totalVal">$0</span></div>
+      <button class="checkout" id="checkout" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5C9.7 8.7 9 7.1 8.8 6.5c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.3.3-1 .9-1 2.3s1 2.7 1.2 2.9c.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 5-1.3A10 10 0 1 0 12 2z"/></svg>
+        <span id="checkoutText">Comprar por WhatsApp</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- NUEVO: mini formulario de pedido -->
+  <div class="drawer-body" id="cartCheckout" style="display:none">
+    <button class="chk-back" id="chkBack">← Volver</button>
+    <div class="chk-field">
+      <label id="chkNameLbl">Nombre completo</label>
+      <input id="chkName" autocomplete="name">
+    </div>
+    <div class="chk-field">
+      <label id="chkPhoneLbl">Teléfono</label>
+      <input id="chkPhone" type="tel" autocomplete="tel">
+    </div>
+    <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Inter',sans-serif" id="chkHowLbl">¿Cómo lo quieres recibir?</label>
+    <div class="chk-opts">
+      <div class="chk-opt" data-m="envio" id="chkOptShip">
+        <div class="ic">📦</div><div class="ti" id="chkShipTi">Envío</div><div class="su" id="chkShipSu">A tu dirección</div>
+      </div>
+      <div class="chk-opt" data-m="personal" id="chkOptPersonal">
+        <div class="ic">🤝</div><div class="ti" id="chkPickTi">Personal</div><div class="su" id="chkPickSu">Lo coordinamos</div>
+      </div>
+    </div>
+    <div id="chkAddrBox" style="display:none" class="chk-field">
+      <label id="chkAddrLbl">Dirección de envío</label>
+      <textarea id="chkAddr" placeholder="Calle, ciudad, estado y código postal"></textarea>
+    </div>
+    <div id="chkPickBox" style="display:none" class="chk-note">Coordinamos el lugar y la hora por WhatsApp.</div>
+    <div class="chk-err" id="chkErr">Completa tu nombre, teléfono y cómo lo quieres recibir.</div>
+    <div class="total-row"><span class="t-label" id="chkTotalLabel">Total</span><span class="t-val" id="chkTotalVal">$0</span></div>
+    <button class="checkout" id="chkSubmitBtn">Confirmar y enviar</button>
+  </div>
+
+  <!-- NUEVO: confirmación -->
+  <div class="drawer-body chk-done" id="cartDone" style="display:none">
+    <div style="font-size:34px">✓</div>
+    <div id="chkDoneTitle" style="font-family:'Anton',sans-serif;font-size:20px;color:#fff;margin-top:8px">¡Pedido recibido!</div>
+    <div class="num" id="chkOrderNum"></div>
+    <p id="chkDoneSub">Guarda tu número de pedido. Ahora te llevamos a WhatsApp para coordinar el pago.</p>
+    <a class="checkout" id="chkWaLink" href="#" target="_blank" style="text-decoration:none;display:flex">Continuar en WhatsApp</a>
   </div>
 </aside>
 
 <script>
 /* ============================================================
-   👇👇  CONFIG — IGUAL QUE EN EL ADMIN  👇👇
+   CONFIGURACIÓN · lo único que cambias por cliente
    ============================================================ */
-const CONFIG = {
-  SUPABASE_URL : "https://qiphngqxwsigmpjhroqv.supabase.co",
-  SUPABASE_KEY : "sb_publishable_TgsDBkfyOEHncvcBhjwtsQ_xvC5-Ay6",
-  TABLE        : "productos",
-  WHATSAPP     : "16292025713",
-  SITE         : "https://amhstore.store"
-};
+const STORE_ID = 3;
+const SB_URL = 'https://drkcstmcdscklcrefxbs.supabase.co';
+const SB_KEY = 'sb_publishable_k4jAuf7UCzpT_kp2jSpW-A_1ICXHA2s';
+const sb = supabase.createClient(SB_URL, SB_KEY);
 /* ============================================================ */
+
+const CAT_DICT = {
+  es:{relojes:'Relojes',joyería:'Joyería',joyeria:'Joyería',cadenas:'Cadenas',gorras:'Gorras',anillos:'Anillos',pulseras:'Pulseras',aretes:'Aretes',lentes:'Lentes',accesorios:'Accesorios'},
+  en:{relojes:'Watches',joyería:'Jewelry',joyeria:'Jewelry',cadenas:'Chains',gorras:'Caps',anillos:'Rings',pulseras:'Bracelets',aretes:'Earrings',lentes:'Sunglasses',accesorios:'Accessories'}
+};
+function catLabel(name){
+  const key=(name||'').toLowerCase().trim();
+  if(CAT_DICT.es[key]) return lang==='es'?CAT_DICT.es[key]:CAT_DICT.en[key];
+  return name;
+}
 
 const T={
  es:{lang:"EN",eyebrow:"Relojes · Joyería · Accesorios",tag:"Piezas seleccionadas. Estilo que se lleva puesto.",
      loading:"Cargando catálogo…",empty:"Pronto agregamos productos aquí.",all:"Todo",add:"Agregar",
      cart:"Tu carrito",cartEmpty:"Tu carrito está vacío",total:"Total",checkout:"Comprar por WhatsApp",
-     foot:"Escríbenos por WhatsApp para comprar",hi:"Hola AMH STORE 👋 Quiero pedir:",totalWord:"Total",
-     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito",newColl:"Colección",photosRef:"📷 Ver producto:"},
+     foot:"Escríbenos por WhatsApp para comprar",hi:"Hola AMH STORE 👋 Hice el pedido",totalWord:"Total",
+     ask:"Consultar",sold:"Agotado",sizes:"Medidas / Tallas",remove:"Quitar",addCart:"Agregar al carrito",newColl:"Colección",photosRef:"📷 Ver producto:",
+     chkName:'Nombre completo',chkPhone:'Teléfono',chkHow:'¿Cómo lo quieres recibir?',chkShipTi:'Envío',chkShipSu:'A tu dirección',
+     chkPickTi:'Personal',chkPickSu:'Lo coordinamos',chkAddr:'Dirección de envío',chkPickNote:'Coordinamos el lugar y la hora por WhatsApp.',
+     chkErr:'Completa tu nombre, teléfono y cómo lo quieres recibir.',chkSubmit:'Confirmar y enviar',chkBack:'← Volver',
+     chkDoneTitle:'¡Pedido recibido!',chkDoneSub:'Guarda tu número de pedido. Ahora te llevamos a WhatsApp para coordinar el pago.',
+     chkWa:'Continuar en WhatsApp',chkSending:'Enviando...',chkFail:'No se pudo enviar. Intenta de nuevo.'},
  en:{lang:"ES",eyebrow:"Watches · Jewelry · Accessories",tag:"Curated pieces. Style you actually wear.",
      loading:"Loading catalog…",empty:"Products coming soon.",all:"All",add:"Add",
      cart:"Your cart",cartEmpty:"Your cart is empty",total:"Total",checkout:"Checkout on WhatsApp",
-     foot:"Message us on WhatsApp to order",hi:"Hi AMH STORE 👋 I'd like to order:",totalWord:"Total",
-     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart",newColl:"Collection",photosRef:"📷 View item:"}
+     foot:"Message us on WhatsApp to order",hi:"Hi AMH STORE 👋 I placed order",totalWord:"Total",
+     ask:"Ask price",sold:"Sold out",sizes:"Sizes / Measurements",remove:"Remove",addCart:"Add to cart",newColl:"Collection",photosRef:"📷 View item:",
+     chkName:'Full name',chkPhone:'Phone',chkHow:'How do you want it?',chkShipTi:'Shipping',chkShipSu:'To your address',
+     chkPickTi:'In person',chkPickSu:'We arrange it',chkAddr:'Shipping address',chkPickNote:'We arrange the place and time on WhatsApp.',
+     chkErr:'Fill in your name, phone and how you want it.',chkSubmit:'Confirm and send',chkBack:'← Back',
+     chkDoneTitle:'Order received!',chkDoneSub:'Save your order number. We\u2019ll take you to WhatsApp to arrange payment.',
+     chkWa:'Continue on WhatsApp',chkSending:'Sending...',chkFail:'Could not send. Try again.'}
 };
 
-let lang="es",products=[],activeCat="__all__",cart={};
+let lang="es",store=null,categories=[],products=[],activeCat="__all__",cart={},checkoutMode=null;
 const $=id=>document.getElementById(id);
 const money=n=>"$"+Number(n).toLocaleString("en-US",{maximumFractionDigits:0});
-const finalPrice=p=>p.discount_price!=null?p.discount_price:p.precio;
-const photo=p=>Array.isArray(p.fotos)&&p.fotos.length?p.fotos[0]:null;
-
-/* ---------- TRADUCCIÓN AUTOMÁTICA (es → en) ---------- */
-const txCache={};
-async function tx(text){
-  if(!text||lang!=="en") return text;
-  if(txCache[text]) return txCache[text];
-  try{
-    const url="https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=en&dt=t&q="+encodeURIComponent(text);
-    const r=await fetch(url); const d=await r.json();
-    let out=""; if(d&&d[0]) d[0].forEach(x=>{if(x[0])out+=x[0];});
-    if(out) txCache[text]=out;
-    return out||text;
-  }catch(e){return text;}
-}
-async function translateView(){
-  if(lang!=="en") return;
-  const els=document.querySelectorAll("[data-tx]");
-  for(const el of els){
-    const original=el.getAttribute("data-tx");
-    if(original) el.textContent=await tx(original);
-  }
-}
+const finalPrice=p=>p.discount_price!=null?p.discount_price:p.price;
+const photo=p=>Array.isArray(p.images)&&p.images.length?p.images[0]:(p.image_url||null);
+function pDesc(p){ return (lang==='es' && p.description_es) ? p.description_es : (p.description||p.description_es||''); }
+function pShort(p){ return (lang==='es' && p.description_short_es) ? p.description_short_es : (p.description_short||p.description_short_es||''); }
+function categoryName(id){ const c=categories.find(x=>x.id===id); return c?c.name:''; }
 
 async function load(){
   try{
-    const r=await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${CONFIG.TABLE}?select=*&order=sort_order.asc`,
-      {headers:{apikey:CONFIG.SUPABASE_KEY,Authorization:"Bearer "+CONFIG.SUPABASE_KEY}});
-    if(!r.ok) throw new Error(r.status);
-    const all=await r.json();
-    products=all.filter(p=>!p.hidden).sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+    const [rs,rc,rp] = await Promise.all([
+      sb.from('stores').select('*').eq('id',STORE_ID).single(),
+      sb.from('categories').select('*').eq('store_id',STORE_ID).order('position'),
+      sb.from('products').select('*').eq('store_id',STORE_ID).eq('hidden',false).order('position')
+    ]);
+    if(rs.error) throw rs.error;
+    store=rs.data; categories=rc.data||[];
+    products=(rp.data||[]).sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+
     $("stateBox").style.display="none";
     renderFilters();renderGrid();
-    // deep-link: si el enlace trae ?p=ID, abre ese producto directo
+
     const pid=new URLSearchParams(location.search).get("p");
     if(pid){
       const prod=products.find(x=>String(x.id)===String(pid));
       if(prod) setTimeout(()=>openModal(prod.id),300);
     }
   }catch(e){
+    console.error(e);
     $("stateBox").innerHTML=`<p style="color:var(--err)">No se pudo cargar el catálogo.<br><small>Revisa la config de Supabase.</small></p>`;
   }
 }
 
+function categoriesInUse(){
+  const ids={}; products.forEach(p=>{ if(p.category_id) ids[p.category_id]=true; });
+  return categories.filter(c=>ids[c.id]);
+}
+
 function renderFilters(){
   const t=T[lang];
-  const cats=[...new Set(products.map(p=>p.categoria).filter(Boolean))];
+  const cats=categoriesInUse();
   let html=`<button class="chip ${activeCat==='__all__'?'active':''}" data-c="__all__">${t.all}</button>`;
-  cats.forEach(c=>html+=`<button class="chip ${activeCat===c?'active':''}" data-c="${c}" data-tx="${c}">${c}</button>`);
+  cats.forEach(c=>html+=`<button class="chip ${activeCat===c.id?'active':''}" data-c="${c.id}">${catLabel(c.name)}</button>`);
   $("filters").innerHTML=html;
-  document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{activeCat=b.dataset.c;renderFilters();renderGrid();});
+  document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{activeCat=b.dataset.c==='__all__'?'__all__':Number(b.dataset.c);renderFilters();renderGrid();});
   renderMarquee(cats);
-  translateView();
 }
 
 function renderMarquee(cats){
   const bar=$("marqueeBar"), track=$("marqueeTrack");
   if(!cats.length){bar.style.display="none";return;}
   bar.style.display="flex";
-  // una tanda de categorías con rombos, tocables para filtrar
-  const one=cats.map(c=>`<span class="mq-item" data-c="${c}" data-tx="${c}">${c}</span>`).join('<span class="mq-dia">◆</span>');
+  const one=cats.map(c=>`<span class="mq-item" data-c="${c.id}">${catLabel(c.name)}</span>`).join('<span class="mq-dia">◆</span>');
   const block=`${one}<span class="mq-dia">◆</span>`;
-  // se duplica para loop infinito continuo
   track.innerHTML=block+block;
-  // velocidad constante (píxeles por segundo), no depende de cuántas categorías haya
   requestAnimationFrame(()=>{
     const halfWidth=track.scrollWidth/2;
-    const SPEED=180; // px por segundo — súbelo para más rápido, bájalo para más lento
+    const SPEED=180;
     track.style.animationDuration=Math.max(6,halfWidth/SPEED)+"s";
   });
-  track.querySelectorAll(".mq-item").forEach(el=>el.onclick=()=>{activeCat=el.dataset.c;renderFilters();renderGrid();window.scrollTo({top:0,behavior:"smooth"});});
+  track.querySelectorAll(".mq-item").forEach(el=>el.onclick=()=>{activeCat=Number(el.dataset.c);renderFilters();renderGrid();window.scrollTo({top:0,behavior:"smooth"});});
 }
 
 function priceHTML(p,t){
-  if(p.precio==null&&p.discount_price==null) return t.ask;
-  if(p.discount_price!=null) return `<s>${money(p.precio)}</s>${money(p.discount_price)}`;
-  return money(p.precio);
+  if(p.price==null&&p.discount_price==null) return t.ask;
+  if(p.discount_price!=null) return `<s>${money(p.price)}</s>${money(p.discount_price)}`;
+  return money(p.price);
 }
 
 function cardHTML(p,delay,t){
@@ -388,12 +450,12 @@ function cardHTML(p,delay,t){
   return `<div class="card ${p.sold_out?'sold':''}" style="animation-delay:${delay}ms" onclick="openModal(${p.id})">
       <div class="card-img">
         <div class="tags">${tags}</div>
-        ${f?`<img src="${f}" alt="${p.nombre}" loading="lazy" onerror="this.style.opacity=.15">`:'<div class="noimg">📷</div>'}
+        ${f?`<img src="${f}" alt="${p.name}" loading="lazy" onerror="this.style.opacity=.15">`:'<div class="noimg">📷</div>'}
       </div>
       <div class="card-body">
-        <span class="card-cat" data-tx="${p.categoria||''}">${p.categoria||''}</span>
-        <div class="card-name">${p.nombre}</div>
-        <div class="card-desc" data-tx="${(p.descripcion_breve||'').replace(/"/g,'&quot;')}">${p.descripcion_breve||''}</div>
+        <span class="card-cat">${catLabel(categoryName(p.category_id))}</span>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${pShort(p)}</div>
         <div class="card-foot">
           <span class="price">${priceHTML(p,t)}</span>
           <button class="add" onclick="event.stopPropagation();addToCart(${p.id})" ${p.sold_out?'disabled':''}>
@@ -406,29 +468,28 @@ function cardHTML(p,delay,t){
 
 function renderGrid(){
   const t=T[lang];
-  const list=activeCat==="__all__"?products:products.filter(p=>p.categoria===activeCat);
+  const list=activeCat==="__all__"?products:products.filter(p=>p.category_id===activeCat);
   if(!list.length){$("grid").innerHTML=`<div class="state">${t.empty}</div>`;return;}
 
-  // agrupar por categoría, en el orden en que aparecen
   const order=[], groups={};
   list.forEach(p=>{
-    const c=p.categoria||"—";
+    const c=p.category_id||0;
     if(!groups[c]){groups[c]=[];order.push(c);}
     groups[c].push(p);
   });
 
   const introDone=document.body.classList.contains("ready");
   let idx=0, html="";
-  order.forEach(cat=>{
-    const label = t.lang==="ES" ? "Colección" : "Colección"; // etiqueta pequeña
-    html+=`<section class="cat-section" id="sec-${cat.replace(/\s+/g,'-')}">
+  order.forEach(catId=>{
+    const label=catLabel(categoryName(catId));
+    html+=`<section class="cat-section">
       <div class="cat-banner">
         <div class="cat-banner-label">${t.newColl}</div>
-        <div class="cat-banner-title" data-tx="${cat}">${cat}</div>
+        <div class="cat-banner-title">${label}</div>
         <div class="cat-banner-line"></div>
       </div>
       <div class="grid">`;
-    groups[cat].forEach(p=>{
+    groups[catId].forEach(p=>{
       const delay=introDone?Math.min(idx*60,700):2400+Math.min(idx*70,800);
       html+=cardHTML(p,delay,t);
       idx++;
@@ -436,21 +497,20 @@ function renderGrid(){
     html+=`</div></section>`;
   });
   $("grid").innerHTML=html;
-  translateView();
 }
 
-/* ---------- MODAL ---------- */
+let mCurSize=null;
 function openModal(id){
   const p=products.find(x=>x.id===id);if(!p)return;
   const t=T[lang];
-  const fotos=Array.isArray(p.fotos)?p.fotos:[];
+  const fotos=Array.isArray(p.images)?p.images:(p.image_url?[p.image_url]:[]);
   $("mBox").innerHTML=`
-    ${fotos.length?`<div class="m-photos">${fotos.map(f=>`<img src="${f}" alt="${p.nombre}">`).join("")}</div>`:''}
+    ${fotos.length?`<div class="m-photos">${fotos.map(f=>`<img src="${f}" alt="${p.name}">`).join("")}</div>`:''}
     <div class="m-body">
-      <div class="m-cat" data-tx="${p.categoria||''}">${p.categoria||''}</div>
-      <div class="m-name">${p.nombre}</div>
+      <div class="m-cat">${catLabel(categoryName(p.category_id))}</div>
+      <div class="m-name">${p.name}</div>
       <div class="m-price">${priceHTML(p,t)}</div>
-      ${p.descripcion?`<div class="m-desc" data-tx="${(p.descripcion||'').replace(/"/g,'&quot;')}">${p.descripcion}</div>`:''}
+      ${pDesc(p)?`<div class="m-desc">${pDesc(p)}</div>`:''}
       ${p.medidas?`<div class="sizes"><b>${t.sizes}</b>${p.medidas}</div>`:''}
       <div class="m-actions">
         <button class="m-add" onclick="addToCart(${p.id});closeModal()" ${p.sold_out?'disabled':''}>
@@ -460,11 +520,9 @@ function openModal(id){
       </div>
     </div>`;
   $("modal").classList.add("open");$("overlay").classList.add("open");
-  translateView();
 }
 function closeModal(){$("modal").classList.remove("open");if(!$("drawer").classList.contains("open"))$("overlay").classList.remove("open");}
 
-/* ---------- CARRITO ---------- */
 function addToCart(id){
   const p=products.find(x=>x.id===id);
   if(!p||p.sold_out)return;
@@ -488,7 +546,7 @@ function renderCart(){
       return `<div class="cart-item">
         ${f?`<img src="${f}" onerror="this.style.opacity=.15">`:'<div class="noimg2">📷</div>'}
         <div class="ci-info">
-          <div class="ci-name">${i.nombre}</div>
+          <div class="ci-name">${i.name}</div>
           <div class="ci-price">${finalPrice(i)!=null?money(finalPrice(i)):t.ask}</div>
           <div class="qty">
             <button onclick="changeQty(${i.id},-1)">−</button><span>${i.qty}</span>
@@ -502,21 +560,99 @@ function renderCart(){
   $("totalVal").textContent=money(cartTotal());
 }
 
-function openCart(){$("drawer").classList.add("open");$("overlay").classList.add("open");}
+function openCart(){$("drawer").classList.add("open");$("overlay").classList.add("open");showCartMain();}
 function closeCart(){$("drawer").classList.remove("open");if(!$("modal").classList.contains("open"))$("overlay").classList.remove("open");}
 
-function checkout(){
-  const t=T[lang],items=Object.values(cart);if(!items.length)return;
-  const base=(CONFIG.SITE||location.origin).replace(/\/$/,"");
-  let msg=t.hi+"\n\n", links="";
+function showCartMain(){ $("cartMain").style.display="contents"; $("cartCheckout").style.display="none"; $("cartDone").style.display="none"; }
+function showCheckoutForm(){
+  $("cartMain").style.display="none"; $("cartCheckout").style.display="block"; $("cartDone").style.display="none";
+  $("chkTotalVal").textContent=money(cartTotal());
+  applyLangCheckout();
+}
+$("chkBack").onclick=showCartMain;
+$("chkOptShip").onclick=()=>chkMode('envio');
+$("chkOptPersonal").onclick=()=>chkMode('personal');
+function chkMode(m){
+  checkoutMode=m;
+  $("chkOptShip").classList.toggle('active',m==='envio');
+  $("chkOptPersonal").classList.toggle('active',m==='personal');
+  $("chkAddrBox").style.display=m==='envio'?'block':'none';
+  $("chkPickBox").style.display=m==='personal'?'block':'none';
+  $("chkErr").classList.remove('on');
+}
+
+function buildMsg(orderNumber,name,phone,howLabel,place){
+  const t=T[lang],items=Object.values(cart);
+  const base=(store&&store.domain?('https://'+store.domain):location.origin).replace(/\/$/,"");
+  let msg=t.hi+" *"+orderNumber+"*:\n\n", links="";
   items.forEach((i,idx)=>{
     const pr=finalPrice(i);
-    msg+=`${idx+1}) ${i.nombre}${i.categoria?` (${i.categoria})`:''} x${i.qty} — ${pr!=null?money(pr*i.qty):t.ask}\n`;
+    msg+=`${idx+1}) ${i.name} — ${pr!=null?money(pr*i.qty)+' x'+i.qty:t.ask}\n`;
     links+=`${idx+1}) ${base}/?p=${i.id}\n`;
   });
-  msg+=`\n${t.totalWord}: ${money(cartTotal())}`;
+  msg+=`\n${t.totalWord}: ${money(cartTotal())}\n\n${name}\n${phone}\n${howLabel}: ${place}`;
   if(links) msg+=`\n\n──────────\n${t.photosRef}\n${links}`;
-  window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank");
+  return msg;
+}
+
+async function submitOrder(){
+  const t=T[lang];
+  const name=$("chkName").value.trim();
+  const phone=$("chkPhone").value.trim();
+  const addr=$("chkAddr").value.trim();
+  const errEl=$("chkErr");
+
+  if(!name||!phone||!checkoutMode||(checkoutMode==='envio'&&!addr)){
+    errEl.textContent=t.chkErr; errEl.classList.add('on'); return;
+  }
+  errEl.classList.remove('on');
+
+  const btn=$("chkSubmitBtn");
+  const original=btn.innerHTML;
+  btn.disabled=true; btn.innerHTML=`<span class="spin2"></span> ${t.chkSending}`;
+
+  const isShip=checkoutMode==='envio';
+  const items=Object.values(cart).map(i=>({product_id:i.id,name:i.name,qty:i.qty,price:finalPrice(i)}));
+
+  try{
+    const r=await sb.rpc('create_order',{
+      p_store_id: STORE_ID,
+      p_name: name,
+      p_phone: phone,
+      p_address: isShip?addr:null,
+      p_items: items,
+      p_total: cartTotal(),
+      p_note: isShip?'Envío':'Personal'
+    });
+    if(r.error) throw r.error;
+    const orderNumber=r.data;
+
+    const howLabel = isShip ? t.chkShipTi : t.chkPickTi;
+    const place = isShip ? addr : t.chkPickSu;
+    const waMsg=buildMsg(orderNumber,name,phone,howLabel,place);
+    const waLink=`https://wa.me/${store.whatsapp}?text=${encodeURIComponent(waMsg)}`;
+
+    $("chkOrderNum").textContent=orderNumber;
+    $("chkWaLink").href=waLink;
+    $("cartCheckout").style.display="none";
+    $("cartDone").style.display="block";
+    cart={}; renderCart();
+  }catch(e){
+    console.error(e);
+    errEl.textContent=t.chkFail; errEl.classList.add('on');
+    btn.disabled=false; btn.innerHTML=original;
+  }
+}
+$("chkSubmitBtn").onclick=submitOrder;
+
+function applyLangCheckout(){
+  const t=T[lang];
+  $("chkNameLbl").textContent=t.chkName; $("chkPhoneLbl").textContent=t.chkPhone;
+  $("chkHowLbl").textContent=t.chkHow; $("chkShipTi").textContent=t.chkShipTi; $("chkShipSu").textContent=t.chkShipSu;
+  $("chkPickTi").textContent=t.chkPickTi; $("chkPickSu").textContent=t.chkPickSu; $("chkAddrLbl").textContent=t.chkAddr;
+  $("chkPickBox").textContent=t.chkPickNote; $("chkBack").textContent=t.chkBack; $("chkSubmitBtn").textContent=t.chkSubmit;
+  $("chkTotalLabel").textContent=t.total; $("chkDoneTitle").textContent=t.chkDoneTitle; $("chkDoneSub").textContent=t.chkDoneSub;
+  $("chkWaLink").textContent=t.chkWa;
 }
 
 function applyLang(){
@@ -531,8 +667,8 @@ $("langBtn").onclick=()=>{lang=lang==="es"?"en":"es";applyLang();};
 $("cartBtn").onclick=openCart;
 $("closeCart").onclick=closeCart;
 $("overlay").onclick=()=>{closeModal();closeCart();};
-$("checkout").onclick=checkout;
-/* ---------- FONDO: HUMO + BRASAS ---------- */
+$("checkout").onclick=showCheckoutForm;
+
 (function(){
   const cv=document.getElementById("bgCanvas");
   if(!cv) return;
@@ -565,7 +701,7 @@ $("checkout").onclick=checkout;
     requestAnimationFrame(draw);
   }
   size();make();
-  if(reduce){ // fondo estático suave
+  if(reduce){
     ctx.globalCompositeOperation="lighter";
     for(const o of clouds){const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
       g.addColorStop(0,`hsla(${o.h},70%,55%,${o.a})`);g.addColorStop(1,"hsla(270,70%,50%,0)");
@@ -576,7 +712,6 @@ $("checkout").onclick=checkout;
 })();
 
 $("year").textContent=new Date().getFullYear();
-// si se abre un producto directo (?p=), saltar la intro para ver la foto rápido
 if(new URLSearchParams(location.search).get("p")){
   const intro=$("intro"); if(intro) intro.style.display="none";
   document.body.classList.add("ready");
